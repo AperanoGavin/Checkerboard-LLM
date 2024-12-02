@@ -4,6 +4,8 @@ from checkerboard import draw_checkerboard
 from pieces import init_pieces, draw_pieces
 from startmenu import draw_start_menu
 
+VERTICAL_OFFSET = -60
+
 
 class Game:
     def __init__(self):
@@ -24,7 +26,8 @@ class Game:
 
     def move_piece(self, piece, new_x, new_y):
         piece.x = new_x
-        piece.y = new_y
+        piece.y = new_y  
+
 
     def draw(self, screen):
         draw_checkerboard(screen)

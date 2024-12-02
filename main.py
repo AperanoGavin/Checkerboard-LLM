@@ -47,7 +47,9 @@ def main():
 
                     if game.selected_piece:
                         if game.is_valid_move(game.selected_piece, mouse_x, mouse_y):
-                            game.move_piece(game.selected_piece, mouse_x, mouse_y)
+                            #centrer les pieces
+                            #game.move_piece(game.selected_piece, mouse_x, mouse_y)
+                            game.move_piece(game.selected_piece, mouse_x // CASE_SIZE * CASE_SIZE, mouse_y // CASE_SIZE * CASE_SIZE)
                         game.selected_piece = None
                     elif selected_piece:
                         game.selected_piece = selected_piece

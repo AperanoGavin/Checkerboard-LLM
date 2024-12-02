@@ -15,6 +15,7 @@ screen = pygame.display.set_mode((SCREEN_HEIGHT, SCREEN_HEIGHT))
 pygame.display.set_caption('checkerboard')
 
 
+current_player = 1
 
 
 

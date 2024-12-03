@@ -1,8 +1,7 @@
-# main.py
 import pygame
 from checkerboard import draw_checkerboard
 from config import SCREEN_HEIGHT, CASE_SIZE
-from pieces import BLACK_PIECE, WHITE_PIECE, init_pieces, draw_pieces
+from pieces import init_pieces, draw_pieces
 from game import Game
 
 # Init of Pygame
@@ -12,8 +11,6 @@ font = pygame.font.Font("AntonSC-Regular.ttf", 50)
 # Create screen
 screen = pygame.display.set_mode((SCREEN_HEIGHT, SCREEN_HEIGHT))
 pygame.display.set_caption('checkerboard')
-
-current_player = 1
 
 def main():
     running = True
@@ -31,9 +28,8 @@ def main():
                 selected_piece = game.get_piece_at(mouse_x // CASE_SIZE * CASE_SIZE, mouse_y // CASE_SIZE * CASE_SIZE)
 
                 if game.selected_piece:
-                    if game.is_valid_move(game.selected_piece, mouse_x, mouse_y):
-                        # Centrer les pièces
-                        game.move_piece(game.selected_piece, mouse_x // CASE_SIZE * CASE_SIZE, mouse_y // CASE_SIZE * CASE_SIZE)
+                    # Centrer les pièces
+                    game.move_piece(game.selected_piece, mouse_x // CASE_SIZE * CASE_SIZE, mouse_y // CASE_SIZE * CASE_SIZE)
                     game.selected_piece = None
                 elif selected_piece:
                     game.selected_piece = selected_piece

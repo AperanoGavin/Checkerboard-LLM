@@ -5,6 +5,7 @@ from pieces import init_pieces, draw_pieces
 from startmenu import draw_start_menu
 
 VERTICAL_OFFSET = -60
+current_player = 1
 
 
 class Game:

@@ -1,7 +1,7 @@
 import pygame
 from config import CASE_SIZE
 
-WHITE_PIECE = (255, 255, 255)
+WHITE_PIECE = (102, 0, 0)
 BLACK_PIECE = (160, 160, 160)
 
 

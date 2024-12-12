@@ -12,5 +12,3 @@ def draw_checkerboard(screen):
                     BLACK,
                     (colonne * CASE_SIZE, ligne * CASE_SIZE, CASE_SIZE, CASE_SIZE)
                 )
-
-

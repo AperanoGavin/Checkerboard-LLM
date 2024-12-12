@@ -3,6 +3,7 @@ from checkerboard import draw_checkerboard
 from config import SCREEN_HEIGHT, CASE_SIZE
 from pieces import init_pieces, draw_pieces
 from game import Game
+from agent.QAgent import QAgent 
 
 # Init of Pygame
 pygame.init()
@@ -13,31 +14,42 @@ screen = pygame.display.set_mode((SCREEN_HEIGHT, SCREEN_HEIGHT))
 pygame.display.set_caption('checkerboard')
 
 def main():
-    running = True
-    game = Game()  # Instancier la classe Game pour gérer la logique de jeu
+    pygame.init()
+    screen = pygame.display.set_mode((SCREEN_HEIGHT, SCREEN_HEIGHT))
+    pygame.display.set_caption('checkerboard')
+    game = Game()
+    agent = QAgent()
 
+    running = True
     while running:
+        state = tuple((piece.x, piece.y, piece.color) for piece in game.pieces)  # État actuel du jeu
+        valid_actions = QAgent.generate_valid_actions(game)  # Actions valides dynamiques
+
+        # L'agent choisit une action
+        if valid_actions:
+            action = agent.choose_action(state, valid_actions)
+            selected_piece_pos, new_pos = action
+            selected_piece = game.get_piece_at(*selected_piece_pos)
+
+            if selected_piece:
+                reward = game.move_piece(selected_piece, *new_pos)  # Calculer la récompense
+                next_state = tuple((piece.x, piece.y, piece.color) for piece in game.pieces)
+                next_valid_actions = QAgent.generate_valid_actions(game)
+
+                # Mise à jour de la Q-Table
+                agent.update_q_value(state, action, reward, next_state, next_valid_actions)
+
+        # Décroissance du taux d'exploration
+        agent.decay_exploration()
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                mouse_x, mouse_y = pygame.mouse.get_pos()
-
-                # Gérer la sélection et les déplacements des pièces
-                selected_piece = game.get_piece_at(mouse_x // CASE_SIZE * CASE_SIZE, mouse_y // CASE_SIZE * CASE_SIZE)
-
-                if game.selected_piece:
-                    # Centrer les pièces
-                    game.move_piece(game.selected_piece, mouse_x // CASE_SIZE * CASE_SIZE, mouse_y // CASE_SIZE * CASE_SIZE)
-                    game.selected_piece = None
-                elif selected_piece:
-                    game.selected_piece = selected_piece
-
-        draw_checkerboard(screen)  # Afficher le damier
-        game.draw(screen)  # Afficher les pièces sur le damier
-
-        pygame.display.flip()  # Mettre à jour l'écran
+        # Redessiner l'écran
+        draw_checkerboard(screen)
+        game.draw(screen)
+        pygame.display.flip()
 
     pygame.quit()
 

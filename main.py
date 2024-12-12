@@ -1,56 +1,57 @@
-# main.py
 import pygame
 from checkerboard import draw_checkerboard
-from config import SCREEN_HEIGHT
-from startmenu import draw_start_menu
+from config import SCREEN_HEIGHT, CASE_SIZE
+from pieces import init_pieces, draw_pieces
+from game import Game
+from agent.QAgent import QAgent 
 
-# Init of  Pygame
+# Init of Pygame
 pygame.init()
-font = pygame.font.Font("AntonSC-Regular.ttf", 50)  
+font = pygame.font.Font("AntonSC-Regular.ttf", 50)
 
-# creat screen
+# Create screen
 screen = pygame.display.set_mode((SCREEN_HEIGHT, SCREEN_HEIGHT))
 pygame.display.set_caption('checkerboard')
 
-# main loop
-''' def main():
-    running = True
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-
-        draw_checkerboard(screen)
-        pygame.display.flip()
-
-    # Quit Pygame
-    pygame.quit() '''
-
-
 def main():
+    pygame.init()
+    screen = pygame.display.set_mode((SCREEN_HEIGHT, SCREEN_HEIGHT))
+    pygame.display.set_caption('checkerboard')
+    game = Game()
+    agent = QAgent()
+
     running = True
-    in_menu = True
     while running:
+        state = tuple((piece.x, piece.y, piece.color) for piece in game.pieces)  # État actuel du jeu
+        valid_actions = QAgent.generate_valid_actions(game)  # Actions valides dynamiques
+
+        # L'agent choisit une action
+        if valid_actions:
+            action = agent.choose_action(state, valid_actions)
+            selected_piece_pos, new_pos = action
+            selected_piece = game.get_piece_at(*selected_piece_pos)
+
+            if selected_piece:
+                reward = game.move_piece(selected_piece, *new_pos)  # Calculer la récompense
+                next_state = tuple((piece.x, piece.y, piece.color) for piece in game.pieces)
+                next_valid_actions = QAgent.generate_valid_actions(game)
+
+                # Mise à jour de la Q-Table
+                agent.update_q_value(state, action, reward, next_state, next_valid_actions)
+
+        # Décroissance du taux d'exploration
+        agent.decay_exploration()
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                mouse_x, mouse_y = pygame.mouse.get_pos()
-                if SCREEN_HEIGHT // 3 < mouse_y < SCREEN_HEIGHT // 3 + 50:  # Start Game
-                    in_menu = False
-                elif SCREEN_HEIGHT // 2 < mouse_y < SCREEN_HEIGHT // 2 + 50:  # Custom Button
-                    print("Opening Customization Menu...")
-                    # Ajouter ici la logique pour personnaliser le jeu
-                elif SCREEN_HEIGHT // 1.5 < mouse_y < SCREEN_HEIGHT // 1.5 + 50:  # Quit Button
-                    running = False
-
-        if in_menu:
-            draw_start_menu(screen)
-        else:
-            draw_checkerboard(screen)  # Fonction à définir pour afficher le damier futuriste
+        # Redessiner l'écran
+        draw_checkerboard(screen)
+        game.draw(screen)
         pygame.display.flip()
 
     pygame.quit()
+
 if __name__ == "__main__":
     main()

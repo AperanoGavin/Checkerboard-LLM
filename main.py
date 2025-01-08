@@ -13,6 +13,9 @@ font = pygame.font.Font("AntonSC-Regular.ttf", 50)
 screen = pygame.display.set_mode((SCREEN_HEIGHT, SCREEN_HEIGHT))
 pygame.display.set_caption('checkerboard')
 
+
+clock = pygame.time.Clock()
+
 def main():
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_HEIGHT, SCREEN_HEIGHT))
@@ -21,6 +24,7 @@ def main():
     agent = QAgent()
 
     running = True
+    clock.tick(30)
     while running:
         state = tuple((piece.x, piece.y, piece.color) for piece in game.pieces)  # État actuel du jeu
         valid_actions = QAgent.generate_valid_actions(game)  # Actions valides dynamiques

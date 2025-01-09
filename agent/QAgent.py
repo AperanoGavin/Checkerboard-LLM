@@ -35,23 +35,21 @@ class QAgent:
         new_q = current_q + self.learning_rate * (reward + self.discount_factor * max_future_q - current_q)
         self.q_table[(state, action)] = new_q
 
-    def decay_exploration(self):
-        """Réduire progressivement le taux d'exploration."""
-        self.exploration_rate *= self.exploration_decay
-        self.exploration_rate = max(self.exploration_rate, 0.1)
+ 
 
 
     def generate_valid_actions(game):
         """Génère toutes les actions valides (mouvements possibles) pour l'état actuel."""
         valid_actions = []
         for piece in game.pieces:
+            if piece.color != game.current_player:  # Ignorer les pièces de l'autre joueur
+                continue
             for dx in [-CASE_SIZE, CASE_SIZE]:
                 for dy in [-CASE_SIZE, CASE_SIZE]:
                     new_x = piece.x + dx
                     new_y = piece.y + dy
-
-                    # Ajouter l'action uniquement si elle respecte les règles (aucune validation forcée ici)
-                    valid_actions.append(((piece.x, piece.y), (new_x, new_y)))
+                    if game.move_piece(piece, new_x, new_y) > 0:  # Vérifie si le mouvement est valide
+                        valid_actions.append(((piece.x, piece.y), (new_x, new_y)))
         return valid_actions
 
 

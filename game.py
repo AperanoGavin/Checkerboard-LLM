@@ -3,11 +3,18 @@ from config import CASE_SIZE, CASES_NUMBER, WHITE, BLACK
 from checkerboard import draw_checkerboard
 from pieces import init_pieces, draw_pieces
 
+WHITE_PIECE = (102, 0, 0)
+BLACK_PIECE = (160, 160, 160)
 
 class Game:
     def __init__(self):
         self.pieces = init_pieces()  # Initialiser les pièces
         self.selected_piece = None  # Aucune pièce sélectionnée au départ
+        self.current_player = WHITE_PIECE
+        
+    def switch_player(self):
+        #Changer le joueur actuel
+        self.current_player = BLACK_PIECE if self.current_player == WHITE_PIECE else WHITE_PIECE
 
     def get_piece_at(self, x, y):
         for piece in self.pieces:

@@ -1,3 +1,4 @@
+import json
 import pygame
 import matplotlib.pyplot as plt
 from checkerboard import draw_checkerboard
@@ -25,7 +26,7 @@ def main():
     agent = QAgent()
 
     # Paramètres d'entraînement
-    num_episodes = 1000  # Nombre de parties
+    num_episodes = 10  # Nombre de parties
     reward_history = []  # Historique des récompenses cumulées
     pieces_captured_history = []  # Historique des captures
 
@@ -44,6 +45,7 @@ def main():
             
             # L'agent choisit une action
             action = agent.choose_action(state, all_actions)
+
             selected_piece_pos, new_pos = action
             selected_piece = game.get_piece_at(*selected_piece_pos)
 

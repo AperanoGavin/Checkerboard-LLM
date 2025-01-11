@@ -1,5 +1,6 @@
 import numpy as np
-from config import SCREEN_HEIGHT, CASE_SIZE
+import random
+from config import SCREEN_HEIGHT, CASE_SIZE , CASES_NUMBER
 from checkerboard import draw_checkerboard
 from pieces import init_pieces, draw_pieces
 from game import Game
@@ -38,7 +39,7 @@ class QAgent:
 
  
 
-    def generate_all_actions(game):
+    ''' def generate_all_actions(game):
         all_actions = []
         for piece in game.pieces:
             for dx in [-CASE_SIZE, CASE_SIZE]:
@@ -46,8 +47,59 @@ class QAgent:
                     new_x = piece.x + dx
                     new_y = piece.y + dy
                     all_actions.append(((piece.x, piece.y), (new_x, new_y)))
-        return all_actions
+        return all_actions '''
+    
+    
+    ''' def generate_all_actions(game):
+        all_actions = []
+        for piece in game.pieces:
+            # Pour chaque pièce, ajouter des déplacements simples et des captures potentielles
+            for dx in [-CASE_SIZE, CASE_SIZE]:
+                for dy in [-CASE_SIZE, CASE_SIZE]:
+                    new_x = piece.x + dx
+                    new_y = piece.y + dy
 
+                    # Vérifier si c'est un saut (capture)
+                    if abs(new_x - piece.x) == 2 * CASE_SIZE and abs(new_y - piece.y) == 2 * CASE_SIZE:
+                        mid_x = (piece.x + new_x) // 2
+                        mid_y = (piece.y + new_y) // 2
+                        captured_piece = game.get_piece_at(mid_x, mid_y)
+
+                        # Vérifier qu'il y a bien une pièce capturée et que la case de destination est libre
+                        if captured_piece and captured_piece.color != piece.color and not game.get_piece_at(new_x, new_y):
+                            all_actions.append(((piece.x, piece.y), (new_x, new_y)))  # Ajouter l'action de capture
+                    else:
+                        # Sinon, ajouter les mouvements simples
+                        all_actions.append(((piece.x, piece.y), (new_x, new_y)))
+        return all_actions '''
+
+
+        
+    def generate_all_actions(game):
+        all_actions = []
+    # Ajouter d'abord les captures possibles
+        captures = game.find_captures()
+        for capture in captures:
+            start_pos, end_pos = capture
+            new_x, new_y = end_pos
+            # Vérifications minimales des limites du plateau
+            if 0 <= new_x < CASES_NUMBER * CASE_SIZE and 0 <= new_y < CASES_NUMBER * CASE_SIZE:
+                all_actions.append(capture)
+            else:
+                print("Capture invalid: out of bounds")  # Debug
+
+        # Si aucune capture n'est possible, ajouter des déplacements simples
+        if not all_actions:
+            for piece in game.pieces:
+                if piece.color == game.current_player:
+                    for dx in [-CASE_SIZE, CASE_SIZE]:
+                        for dy in [-CASE_SIZE, CASE_SIZE]:
+                            next_x = piece.x + dx
+                            next_y = piece.y + dy
+                            if 0 <= next_x < CASES_NUMBER * CASE_SIZE and 0 <= next_y < CASES_NUMBER * CASE_SIZE and not game.get_piece_at(next_x, next_y):
+                                action = ((piece.x, piece.y), (next_x, next_y))
+                                all_actions.append(action)
+        return all_actions
 
 
 

@@ -41,16 +41,18 @@ class Game:
         dx = abs(new_x - piece.x)
         dy = abs(new_y - piece.y)
         
-        print(f"Movement deltas: dx={dx}, dy={dy}")  # Debug
+        #print(f"Movement deltas: dx={dx}, dy={dy}")  # Debug
 
         # Vérifier mouvement diagonal
         if dx != dy:
-            print("Move invalid: not diagonal")  # Debug
+            #print("Move invalid: not diagonal")  # Debug
             return -1
 
         # Copie de sauvegarde des coordonnées originales
         original_x, original_y = piece.x, piece.y
 
+        print(f"dx: {dx}, CASE_SIZE: {CASE_SIZE}, dx == 2 * CASE_SIZE: {dx == 2 * CASE_SIZE}")  # Debug
+        count = 10
         # Gestion de la capture
         if dx == 2 * CASE_SIZE:  # Saut potentiel
             mid_x = (piece.x + new_x) // 2
@@ -83,7 +85,7 @@ class Game:
             print(f"Simple move successful to ({new_x},{new_y})")  # Debug
             return 1
             
-        print("Move invalid: unknown reason")  # Debug
+        #print("Move invalid: unknown reason")  # Debug
         piece.x = original_x
         piece.y = original_y
         return -1
@@ -98,3 +100,25 @@ class Game:
         
         print(f"Game state check - White pieces: {len(white_pieces)}, Black pieces: {len(black_pieces)}")  # Debug
         return not white_pieces or not black_pieces
+    
+    #toutes les captures possibles pour le joueur actuel
+    def find_captures(self):
+        """
+            Retourne toutes les captures possibles pour le joueur actuel.
+        """
+        captures = []
+        for piece in self.pieces:
+            if piece.color == self.current_player:
+                for dx, dy in [(2 * CASE_SIZE, 2 * CASE_SIZE), (2 * CASE_SIZE, -2 * CASE_SIZE),
+                            (-2 * CASE_SIZE, 2 * CASE_SIZE), (-2 * CASE_SIZE, -2 * CASE_SIZE)]:
+                    new_x = piece.x + dx
+                    new_y = piece.y + dy
+                    mid_x = (piece.x + new_x) // 2
+                    mid_y = (piece.y + new_y) // 2
+                    captured_piece = self.get_piece_at(mid_x, mid_y)
+                    target_piece = self.get_piece_at(new_x, new_y)
+
+                    if captured_piece and captured_piece.color != piece.color and target_piece is None:
+                        captures.append(((piece.x, piece.y), (new_x, new_y)))
+        return captures
+    

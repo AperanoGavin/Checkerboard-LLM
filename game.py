@@ -72,3 +72,8 @@ class Game:
     def draw(self, screen):
         draw_checkerboard(screen)
         draw_pieces(screen, self.pieces)
+        
+    def is_game_over(self):
+        white_pieces = [piece for piece in self.pieces if piece.color == WHITE_PIECE]
+        black_pieces = [piece for piece in self.pieces if piece.color == BLACK_PIECE]
+        return not white_pieces or not black_pieces

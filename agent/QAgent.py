@@ -12,16 +12,17 @@ class QAgent:
         self.exploration_rate = exploration_rate
         self.exploration_decay = exploration_decay
 
-    def choose_action(self, state, valid_actions):
+    def choose_action(self, state, all_possible_actions):
         """Choisir une action en fonction de l'exploration ou de l'exploitation."""
         import random
 
         if random.uniform(0, 1) < self.exploration_rate:
-            return random.choice(valid_actions)  # Exploration
+            return random.choice(all_possible_actions)  # Exploration
 
         # Exploitation : choisir l'action avec la plus haute valeur Q
-        q_values = {action: self.q_table.get((state, action), 0) for action in valid_actions}
+        q_values = {action: self.q_table.get((state, action), 0) for action in all_possible_actions}
         return max(q_values, key=q_values.get)
+
 
     def update_q_value(self, state, action, reward, next_state, next_valid_actions):
         """Mettre à jour la Q-Table en fonction de l'algorithme Q-Learning."""
@@ -37,20 +38,16 @@ class QAgent:
 
  
 
-
-    def generate_valid_actions(game):
-        """Génère toutes les actions valides (mouvements possibles) pour l'état actuel."""
-        valid_actions = []
+    def generate_all_actions(game):
+        all_actions = []
         for piece in game.pieces:
-            if piece.color != game.current_player:  # Ignorer les pièces de l'autre joueur
-                continue
             for dx in [-CASE_SIZE, CASE_SIZE]:
                 for dy in [-CASE_SIZE, CASE_SIZE]:
                     new_x = piece.x + dx
                     new_y = piece.y + dy
-                    if game.move_piece(piece, new_x, new_y) > 0:  # Vérifie si le mouvement est valide
-                        valid_actions.append(((piece.x, piece.y), (new_x, new_y)))
-        return valid_actions
+                    all_actions.append(((piece.x, piece.y), (new_x, new_y)))
+        return all_actions
+
 
 
 

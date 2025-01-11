@@ -8,67 +8,86 @@ BLACK_PIECE = (160, 160, 160)
 
 class Game:
     def __init__(self):
-        self.pieces = init_pieces()  # Initialiser les pièces
-        self.selected_piece = None  # Aucune pièce sélectionnée au départ
+        self.pieces = init_pieces()
+        print(f"Initial pieces: {len(self.pieces)}")  # Debug: afficher nombre initial
+        self.selected_piece = None
         self.current_player = WHITE_PIECE
         
     def switch_player(self):
-        #Changer le joueur actuel
         self.current_player = BLACK_PIECE if self.current_player == WHITE_PIECE else WHITE_PIECE
-
+    
     def get_piece_at(self, x, y):
-        for piece in self.pieces:
-            if piece.x == x and piece.y == y:
-                return piece
-        return None
+        pieces_at_pos = [piece for piece in self.pieces if piece.x == x and piece.y == y]
+        if len(pieces_at_pos) > 1:
+            print(f"WARNING: Multiple pieces at {x},{y}: {pieces_at_pos}")  # Debug
+        return pieces_at_pos[0] if pieces_at_pos else None
         
     def move_piece(self, piece, new_x, new_y):
-
-        if not (0 <= new_x < CASES_NUMBER * CASE_SIZE and 0 <= new_y < CASES_NUMBER * CASE_SIZE):
-            return -1
-        target_piece = self.get_piece_at(new_x, new_y)
-
+        print(f"\nAttempting move from ({piece.x},{piece.y}) to ({new_x},{new_y})")  # Debug
+        print(f"Current pieces count: {len(self.pieces)}")  # Debug
         
-        # Empêcher l'empilement avec une pièce de la même couleur
-        if target_piece and target_piece.color == piece.color:
-            return -1  # Mouvement invalide : empilement
+        # Vérifications minimales des limites du plateau
+        if not (0 <= new_x < CASES_NUMBER * CASE_SIZE and 0 <= new_y < CASES_NUMBER * CASE_SIZE):
+            print("Move invalid: out of bounds")  # Debug
+            return -1
 
-        # Vérifier que le mouvement est en diagonale
+        # Vérifier si la destination est occupée
+        target_piece = self.get_piece_at(new_x, new_y)
+        if target_piece:
+            print(f"Move invalid: destination occupied by {target_piece.color}")  # Debug
+            return -1
+
+        # Calculer le déplacement
         dx = abs(new_x - piece.x)
         dy = abs(new_y - piece.y)
-        print(f"Attempting move: {piece.x, piece.y} -> {new_x, new_y} | dx: {dx}, dy: {dy}")
+        
+        print(f"Movement deltas: dx={dx}, dy={dy}")  # Debug
 
-        if dx != dy or dx > CASE_SIZE:
-            return -1  # Mouvement invalide : pas en diagonale
+        # Vérifier mouvement diagonal
+        if dx != dy:
+            print("Move invalid: not diagonal")  # Debug
+            return -1
+
+        # Copie de sauvegarde des coordonnées originales
+        original_x, original_y = piece.x, piece.y
 
         # Gestion de la capture
-        if dx == 2 * CASE_SIZE:  # Vérifier si c'est un saut
+        if dx == 2 * CASE_SIZE:  # Saut potentiel
             mid_x = (piece.x + new_x) // 2
             mid_y = (piece.y + new_y) // 2
             captured_piece = self.get_piece_at(mid_x, mid_y)
             
-
+            print(f"Checking capture at middle point ({mid_x},{mid_y})")  # Debug
+            if captured_piece:
+                print(f"Found piece to capture: color={captured_piece.color}")  # Debug
+            
             if captured_piece and captured_piece.color != piece.color:
-                # Vérifier que la case derrière est libre
-                if target_piece is None:
-                    print(f"Captured piece found at {mid_x, mid_y}, removing it.")
-
-                    self.pieces.remove(captured_piece)  # Retirer la pièce capturée
-                    print(f"Piece at {mid_x, mid_y} has been captured")
+                print("Capturing piece!")  # Debug
+                # Vérifier que la pièce à capturer existe bien dans la liste
+                if captured_piece in self.pieces:
+                    self.pieces.remove(captured_piece)
                     piece.x = new_x
                     piece.y = new_y
-                    return 10  # Récompense pour capture
+                    print(f"Pieces after capture: {len(self.pieces)}")  # Debug
+                    return 10
                 else:
-                    return -1  # Mouvement invalide : case derrière occupée
-
+                    print("WARNING: Piece to capture not found in pieces list")  # Debug
+                    piece.x = original_x
+                    piece.y = original_y
+                    return -1
+        
         # Déplacement simple
-        piece.x = new_x
-        piece.y = new_y
-        return 1  # Récompense pour déplacement valide
-
+        elif dx == CASE_SIZE:
+            piece.x = new_x
+            piece.y = new_y
+            print(f"Simple move successful to ({new_x},{new_y})")  # Debug
+            return 1
+            
+        print("Move invalid: unknown reason")  # Debug
+        piece.x = original_x
+        piece.y = original_y
+        return -1
         
-        
-
     def draw(self, screen):
         draw_checkerboard(screen)
         draw_pieces(screen, self.pieces)
@@ -76,4 +95,6 @@ class Game:
     def is_game_over(self):
         white_pieces = [piece for piece in self.pieces if piece.color == WHITE_PIECE]
         black_pieces = [piece for piece in self.pieces if piece.color == BLACK_PIECE]
+        
+        print(f"Game state check - White pieces: {len(white_pieces)}, Black pieces: {len(black_pieces)}")  # Debug
         return not white_pieces or not black_pieces

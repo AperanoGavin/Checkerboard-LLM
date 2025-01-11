@@ -26,7 +26,7 @@ def main():
     agent = QAgent()
 
     # Paramètres d'entraînement
-    num_episodes = 10  # Nombre de parties
+    num_episodes = 100  # Nombre de parties
     reward_history = []  # Historique des récompenses cumulées
     pieces_captured_history = []  # Historique des captures
 
@@ -39,7 +39,7 @@ def main():
         pieces_captured = 0  # Compteur de pièces capturées
 
         while not game_over and running:
-            clock.tick(30)  # Limiter les FPS pour une visualisation fluide
+            clock.tick(5)  # Limiter les FPS pour une visualisation fluide
             state = tuple((piece.x, piece.y, piece.color) for piece in game.pieces)  # État actuel
             all_actions = QAgent.generate_all_actions(game)  # Toutes les actions possibles
             
